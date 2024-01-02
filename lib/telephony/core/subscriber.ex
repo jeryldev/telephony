@@ -1,4 +1,4 @@
-defmodule Subscriber.Subscriber do
+defmodule Telephony.Core.Subscriber do
   defstruct [:full_name, :id, :phone, subscriber_type: :prepaid]
 
   def new(payload) do

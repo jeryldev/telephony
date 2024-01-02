@@ -1,7 +1,7 @@
-defmodule Subscriber.SubscriberTest do
+defmodule Telephony.Core.SubscriberTest do
   use ExUnit.Case
 
-  alias Subscriber.Subscriber
+  alias Telephony.Core.Subscriber
 
   describe "new/1" do
     test "with valid payload" do
