@@ -8,7 +8,6 @@ defmodule Telephony.Core.SubscriberTest do
       # Given
       payload = %{
         full_name: "John Doe",
-        id: "1234567890",
         phone: "1234567890"
       }
 
@@ -18,7 +17,6 @@ defmodule Telephony.Core.SubscriberTest do
       # Then
       expect = %Subscriber{
         full_name: "John Doe",
-        id: "1234567890",
         phone: "1234567890",
         subscriber_type: :prepaid
       }
