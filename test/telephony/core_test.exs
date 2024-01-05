@@ -8,7 +8,7 @@ defmodule Telephony.CoreTest do
       %Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
-        subscriber_type: :prepaid
+        subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
       }
     ]
 
@@ -41,7 +41,7 @@ defmodule Telephony.CoreTest do
         %Subscriber{
           full_name: "John Doe",
           phone: "1234567890",
-          subscriber_type: :prepaid
+          subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
         }
       ]
 
@@ -65,12 +65,12 @@ defmodule Telephony.CoreTest do
         %Subscriber{
           full_name: "John Doe",
           phone: "1234567890",
-          subscriber_type: :prepaid
+          subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
         },
         %Subscriber{
           full_name: "Jane Doe",
           phone: "0987654321",
-          subscriber_type: :prepaid
+          subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
         }
       ]
 
