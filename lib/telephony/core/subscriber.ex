@@ -19,4 +19,11 @@ defmodule Telephony.Core.Subscriber do
       %Postpaid{} -> Postpaid.make_call(subscriber, time_spent, date)
     end
   end
+
+  def make_recharge(%{subscriber_type: subscriber_type} = subscriber, value, date) do
+    case subscriber_type do
+      %Prepaid{} -> Prepaid.make_recharge(subscriber, value, date)
+      %Postpaid{} -> subscriber
+    end
+  end
 end
