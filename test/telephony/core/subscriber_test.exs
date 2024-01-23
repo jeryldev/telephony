@@ -1,7 +1,7 @@
 defmodule Telephony.Core.SubscriberTest do
   use ExUnit.Case
 
-  alias Telephony.Core.{Call, Postpaid, Prepaid, Subscriber}
+  alias Telephony.Core.{Call, Postpaid, Prepaid, Recharge, Subscriber}
 
   describe "new/1" do
     test "with valid prepaid payload" do
@@ -93,6 +93,58 @@ defmodule Telephony.Core.SubscriberTest do
           %Call{time_spent: 2, date: date},
           %Call{time_spent: 1, date: new_date}
         ]
+      }
+
+      assert expected == result
+    end
+  end
+
+  describe "make_recharge/3" do
+    setup do
+      date = NaiveDateTime.utc_now()
+
+      postpaid = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        subscriber_type: %Postpaid{spent: 0}
+      }
+
+      prepaid = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        subscriber_type: %Prepaid{credits: 7.0, recharges: []},
+        calls: [%Call{time_spent: 2, date: date}]
+      }
+
+      %{date: date, postpaid: postpaid, prepaid: prepaid}
+    end
+
+    test "with valid prepaid recharge params", %{date: date, prepaid: prepaid} do
+      new_date = NaiveDateTime.utc_now()
+      result = Subscriber.make_recharge(prepaid, 100, new_date)
+
+      expected = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        subscriber_type: %Prepaid{
+          credits: 107.0,
+          recharges: [%Recharge{value: 100, date: new_date}]
+        },
+        calls: [%Call{time_spent: 2, date: date}]
+      }
+
+      assert expected == result
+    end
+
+    test "with valid postpaid recharge params", %{postpaid: postpaid} do
+      new_date = NaiveDateTime.utc_now()
+      result = Subscriber.make_recharge(postpaid, 100, new_date)
+
+      expected = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        subscriber_type: %Postpaid{spent: 0},
+        calls: []
       }
 
       assert expected == result
