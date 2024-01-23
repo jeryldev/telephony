@@ -140,14 +140,7 @@ defmodule Telephony.Core.SubscriberTest do
       new_date = NaiveDateTime.utc_now()
       result = Subscriber.make_recharge(postpaid, 100, new_date)
 
-      expected = %Subscriber{
-        full_name: "John Doe",
-        phone: "1234567890",
-        subscriber_type: %Postpaid{spent: 0},
-        calls: []
-      }
-
-      assert expected == result
+      assert {:error, "Only prepaid can make a recharge"} == result
     end
   end
 end

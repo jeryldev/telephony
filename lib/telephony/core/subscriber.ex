@@ -23,7 +23,7 @@ defmodule Telephony.Core.Subscriber do
   def make_recharge(%{subscriber_type: subscriber_type} = subscriber, value, date) do
     case subscriber_type do
       %Prepaid{} -> Prepaid.make_recharge(subscriber, value, date)
-      %Postpaid{} -> subscriber
+      %Postpaid{} -> {:error, "Only prepaid can make a recharge"}
     end
   end
 end
