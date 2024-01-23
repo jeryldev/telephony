@@ -37,7 +37,7 @@ defmodule Telephony.CoreTest do
       result = Core.create_subscriber(subscribers, payload)
 
       # Then
-      expect = [
+      expected = [
         %Subscriber{
           full_name: "John Doe",
           phone: "1234567890",
@@ -45,7 +45,7 @@ defmodule Telephony.CoreTest do
         }
       ]
 
-      assert expect == result
+      assert expected == result
     end
 
     test "with valid params and existing subscribers", %{subscribers: subscribers} do
@@ -61,7 +61,7 @@ defmodule Telephony.CoreTest do
       result = Core.create_subscriber(subscribers, payload)
 
       # Then
-      expect = [
+      expected = [
         %Subscriber{
           full_name: "John Doe",
           phone: "1234567890",
@@ -74,13 +74,13 @@ defmodule Telephony.CoreTest do
         }
       ]
 
-      assert expect == result
+      assert expected == result
     end
 
     test "show error with existing subscriber", %{subscribers: subscribers, payload: payload} do
       result = Core.create_subscriber(subscribers, payload)
-      expect = {:error, "Subscriber `1234567890`, already exists"}
-      assert expect == result
+      expected = {:error, "Subscriber `1234567890`, already exists"}
+      assert expected == result
     end
 
     test "show error when susbcriber type does not exist", %{payload: payload} do

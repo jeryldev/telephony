@@ -16,13 +16,13 @@ defmodule Telephony.Core.SubscriberTest do
       result = Subscriber.new(payload)
 
       # Then
-      expect = %Subscriber{
+      expected = %Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
         subscriber_type: %Prepaid{credits: 0, recharges: []}
       }
 
-      assert expect == result
+      assert expected == result
     end
 
     test "with valid postpaid payload" do
@@ -37,13 +37,13 @@ defmodule Telephony.Core.SubscriberTest do
       result = Subscriber.new(payload)
 
       # Then
-      expect = %Subscriber{
+      expected = %Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
         subscriber_type: %Postpaid{spent: 0}
       }
 
-      assert expect == result
+      assert expected == result
     end
   end
 
