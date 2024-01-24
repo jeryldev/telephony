@@ -1,7 +1,7 @@
 defmodule Telephony.Core.PrepaidTest do
   use ExUnit.Case
 
-  alias Telephony.Core.{Call, Prepaid, Recharge, Subscriber}
+  alias Telephony.Core.{Call, Invoice, Prepaid, Recharge, Subscriber}
 
   setup do
     subscriber = %Subscriber{
@@ -66,8 +66,6 @@ defmodule Telephony.Core.PrepaidTest do
       date = NaiveDateTime.utc_now()
       last_month = NaiveDateTime.add(date, -30, :day)
       two_months_ago = NaiveDateTime.add(last_month, -30, :day)
-      year = date.year
-      month = last_month.month
 
       subscriber = %Subscriber{
         full_name: "John Doe",
@@ -89,6 +87,8 @@ defmodule Telephony.Core.PrepaidTest do
 
       subscriber_type = subscriber.subscriber_type
       calls = subscriber.calls
+      year = last_month.year
+      month = last_month.month
 
       expected = %{
         calls: [
