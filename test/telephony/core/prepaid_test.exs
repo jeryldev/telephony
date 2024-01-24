@@ -60,4 +60,48 @@ defmodule Telephony.Core.PrepaidTest do
       assert expected == result
     end
   end
+
+  describe "Prepaid Invoice print/4" do
+    test "with valid params" do
+      date = NaiveDateTime.utc_now()
+      last_month = NaiveDateTime.add(date, -30, :day)
+      two_months_ago = NaiveDateTime.add(last_month, -30, :day)
+      year = date.year
+      month = last_month.month
+
+      subscriber = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        subscriber_type: %Prepaid{
+          credits: 213,
+          recharges: [
+            %Recharge{value: 100, date: date},
+            %Recharge{value: 100, date: last_month},
+            %Recharge{value: 100, date: two_months_ago}
+          ]
+        },
+        calls: [
+          %Call{time_spent: 10, date: date},
+          %Call{time_spent: 20, date: last_month},
+          %Call{time_spent: 30, date: two_months_ago}
+        ]
+      }
+
+      subscriber_type = subscriber.subscriber_type
+      calls = subscriber.calls
+
+      expected = %{
+        calls: [
+          %{time_spent: 20, value_spent: 29, date: last_month}
+        ],
+        recharges: [
+          %{credits: 100, date: last_month}
+        ]
+      }
+
+      result = Invoice.print(subscriber_type, calls, year, month)
+
+      assert expected == result
+    end
+  end
 end
