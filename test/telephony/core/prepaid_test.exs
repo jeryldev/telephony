@@ -85,11 +85,6 @@ defmodule Telephony.Core.PrepaidTest do
         ]
       }
 
-      subscriber_type = subscriber.subscriber_type
-      calls = subscriber.calls
-      year = last_month.year
-      month = last_month.month
-
       expected = %{
         calls: [
           %{time_spent: 20, value_spent: 29, date: last_month}
@@ -99,6 +94,11 @@ defmodule Telephony.Core.PrepaidTest do
         ],
         credits: 213
       }
+
+      subscriber_type = subscriber.subscriber_type
+      calls = subscriber.calls
+      year = last_month.year
+      month = last_month.month
 
       result = Invoice.print(subscriber_type, calls, year, month)
 
