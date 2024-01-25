@@ -29,6 +29,7 @@ defmodule Telephony.Core.Prepaid do
 
   defimpl Invoice, for: __MODULE__ do
     @price_per_minute 1.45
+
     def print(%{recharges: recharges, credits: credits} = _subscriber_type, calls, year, month) do
       recharges =
         Enum.reduce(recharges, [], fn recharge, acc ->
