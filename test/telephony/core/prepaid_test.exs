@@ -96,7 +96,8 @@ defmodule Telephony.Core.PrepaidTest do
         ],
         recharges: [
           %{credits: 100, date: last_month}
-        ]
+        ],
+        credits: 213
       }
 
       result = Invoice.print(subscriber_type, calls, year, month)
