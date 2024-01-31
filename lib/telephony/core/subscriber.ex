@@ -1,3 +1,11 @@
+defprotocol Subscriber do
+  @fallback_to_any true
+
+  def print_invoice(subscriber_type, calls, year, month)
+  def make_call(subscriber_type, time_spent, date)
+  def make_recharge(subscriber_type, value, date)
+end
+
 defmodule Telephony.Core.Subscriber do
   alias Telephony.Core.{Postpaid, Prepaid}
 
@@ -11,19 +19,5 @@ defmodule Telephony.Core.Subscriber do
   def new(%{subscriber_type: :postpaid} = payload) do
     payload = %{payload | subscriber_type: %Postpaid{}}
     struct(__MODULE__, payload)
-  end
-
-  def make_call(%{subscriber_type: subscriber_type} = subscriber, time_spent, date) do
-    case subscriber_type do
-      %Prepaid{} -> Prepaid.make_call(subscriber, time_spent, date)
-      %Postpaid{} -> Postpaid.make_call(subscriber, time_spent, date)
-    end
-  end
-
-  def make_recharge(%{subscriber_type: subscriber_type} = subscriber, value, date) do
-    case subscriber_type do
-      %Prepaid{} -> Prepaid.make_recharge(subscriber, value, date)
-      %Postpaid{} -> {:error, "Only prepaid can make a recharge"}
-    end
   end
 end
