@@ -1,62 +1,39 @@
 defmodule Telephony.Core.PrepaidTest do
   use ExUnit.Case
 
-  alias Telephony.Core.{Call, Invoice, Prepaid, Recharge, Subscriber}
+  alias Telephony.Core.{Call, Prepaid, Recharge}
 
   setup do
-    subscriber = %Subscriber{
-      full_name: "John Doe",
-      phone: "1234567890",
-      subscriber_type: %Prepaid{credits: 10, recharges: []}
-    }
+    prepaid = %Prepaid{credits: 10, recharges: []}
+    prepaid_without_credits = %Prepaid{credits: 0, recharges: []}
 
-    subscriber_without_credits = %Subscriber{
-      full_name: "John Doe",
-      phone: "1234567890",
-      subscriber_type: %Prepaid{credits: 0, recharges: []}
-    }
-
-    %{subscriber: subscriber, subscriber_without_credits: subscriber_without_credits}
+    %{prepaid: prepaid, prepaid_without_credits: prepaid_without_credits}
   end
 
   describe "make_call/3" do
-    test "with valid params", %{subscriber: subscriber} do
+    test "with valid params", %{prepaid: prepaid} do
       time_spent = 2
       date = NaiveDateTime.utc_now()
-      result = Prepaid.make_call(subscriber, time_spent, date)
-
-      expected = %Subscriber{
-        full_name: "John Doe",
-        phone: "1234567890",
-        subscriber_type: %Prepaid{credits: 7.1, recharges: []},
-        calls: [%Call{time_spent: 2, date: date}]
-      }
-
+      result = Subscriber.make_call(prepaid, time_spent, date)
+      expected = {%Prepaid{credits: 7.1, recharges: []}, %Call{time_spent: 2, date: date}}
       assert expected == result
     end
 
-    test "error without credits", %{subscriber_without_credits: subscriber} do
+    test "error without credits", %{prepaid_without_credits: prepaid_without_credits} do
       time_spent = 2
       date = NaiveDateTime.utc_now()
-      result = Prepaid.make_call(subscriber, time_spent, date)
+      result = Subscriber.make_call(prepaid_without_credits, time_spent, date)
       expected = {:error, "Subscriber does not have credits"}
       assert expected == result
     end
   end
 
   describe "make_recharge/3" do
-    test "with valid params", %{subscriber: subscriber} do
+    test "with valid params", %{prepaid: prepaid} do
       value = 100
       date = NaiveDateTime.utc_now()
-      result = Prepaid.make_recharge(subscriber, value, date)
-
-      expected = %Subscriber{
-        full_name: "John Doe",
-        phone: "1234567890",
-        subscriber_type: %Prepaid{credits: 110, recharges: [%Recharge{value: 100, date: date}]},
-        calls: []
-      }
-
+      result = Subscriber.make_recharge(prepaid, value, date)
+      expected = %Prepaid{credits: 110, recharges: [%Recharge{value: 100, date: date}]}
       assert expected == result
     end
   end
@@ -64,10 +41,10 @@ defmodule Telephony.Core.PrepaidTest do
   describe "Prepaid Invoice print/4" do
     test "with valid params" do
       date = NaiveDateTime.utc_now()
-      last_month = NaiveDateTime.add(date, -30, :day)
-      two_months_ago = NaiveDateTime.add(last_month, -30, :day)
+      last_month = NaiveDateTime.add(date, -31, :day)
+      two_months_ago = NaiveDateTime.add(last_month, -31, :day)
 
-      subscriber = %Subscriber{
+      subscriber = %Telephony.Core.Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
         subscriber_type: %Prepaid{
@@ -100,7 +77,7 @@ defmodule Telephony.Core.PrepaidTest do
       year = last_month.year
       month = last_month.month
 
-      result = Invoice.print(subscriber_type, calls, year, month)
+      result = Subscriber.print_invoice(subscriber_type, calls, year, month)
 
       assert expected == result
     end
