@@ -69,7 +69,7 @@ defmodule Telephony.Core.SubscriberTest do
 
   #   test "with valid postpaid params", %{postpaid: postpaid} do
   #     new_date = NaiveDateTime.utc_now()
-  #     result = Subscriber.make_call(postpaid, 2, new_date)
+  #     result = SubscriberProtocol.make_call(postpaid, 2, new_date)
 
   #     expected = %Subscriber{
   #       full_name: "John Doe",
@@ -83,7 +83,7 @@ defmodule Telephony.Core.SubscriberTest do
 
   #   test "with valid prepaid params", %{date: date, prepaid: prepaid} do
   #     new_date = NaiveDateTime.utc_now()
-  #     result = Subscriber.make_call(prepaid, 1, new_date)
+  #     result = SubscriberProtocol.make_call(prepaid, 1, new_date)
 
   #     expected = %Subscriber{
   #       full_name: "John Doe",
@@ -121,7 +121,7 @@ defmodule Telephony.Core.SubscriberTest do
 
   #   test "with valid prepaid recharge params", %{date: date, prepaid: prepaid} do
   #     new_date = NaiveDateTime.utc_now()
-  #     result = Subscriber.make_recharge(prepaid, 100, new_date)
+  #     result = SubscriberProtocol.make_recharge(prepaid, 100, new_date)
 
   #     expected = %Subscriber{
   #       full_name: "John Doe",
@@ -138,7 +138,7 @@ defmodule Telephony.Core.SubscriberTest do
 
   #   test "with valid postpaid recharge params", %{postpaid: postpaid} do
   #     new_date = NaiveDateTime.utc_now()
-  #     result = Subscriber.make_recharge(postpaid, 100, new_date)
+  #     result = SubscriberProtocol.make_recharge(postpaid, 100, new_date)
 
   #     assert {:error, "Only prepaid can make a recharge"} == result
   #   end

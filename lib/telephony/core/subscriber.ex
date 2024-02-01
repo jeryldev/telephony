@@ -1,4 +1,4 @@
-defprotocol Subscriber do
+defprotocol SubscriberProtocol do
   @fallback_to_any true
 
   def print_invoice(subscriber_type, calls, year, month)

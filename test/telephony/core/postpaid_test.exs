@@ -11,7 +11,7 @@ defmodule Telephony.Core.PostpaidTest do
     test "with valid params", %{postpaid: postpaid} do
       time_spent = 2
       date = NaiveDateTime.utc_now()
-      result = Subscriber.make_call(postpaid, time_spent, date)
+      result = SubscriberProtocol.make_call(postpaid, time_spent, date)
       expected = {%Postpaid{spent: 2.08}, %Call{time_spent: 2, date: date}}
       assert expected == result
     end
@@ -21,7 +21,7 @@ defmodule Telephony.Core.PostpaidTest do
     test "with params", %{postpaid: postpaid} do
       value = 100
       date = NaiveDateTime.utc_now()
-      result = Subscriber.make_recharge(postpaid, value, date)
+      result = SubscriberProtocol.make_recharge(postpaid, value, date)
       expected = {:error, "Only prepaid can make a recharge"}
       assert expected == result
     end
@@ -49,7 +49,7 @@ defmodule Telephony.Core.PostpaidTest do
       }
 
       result =
-        Subscriber.print_invoice(postpaid, calls, last_month.year, last_month.month)
+        SubscriberProtocol.print_invoice(postpaid, calls, last_month.year, last_month.month)
 
       assert expected == result
     end
