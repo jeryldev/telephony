@@ -27,4 +27,11 @@ defmodule Telephony.Core.Subscriber do
       {type, call} -> %{subscriber | type: type, calls: subscriber.calls ++ [call]}
     end
   end
+
+  def make_recharge(subscriber, value, date) do
+    case SubscriberProtocol.make_recharge(subscriber.type, value, date) do
+      {:error, message} -> {:error, message}
+      type -> %{subscriber | type: type}
+    end
+  end
 end

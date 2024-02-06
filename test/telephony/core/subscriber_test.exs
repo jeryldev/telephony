@@ -65,6 +65,23 @@ defmodule Telephony.Core.SubscriberTest do
                  calls: [%Call{time_spent: 1, date: date}]
                }
     end
+
+    test "make_recharge/3" do
+      subscriber = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        type: %Prepaid{credits: 10, recharges: []}
+      }
+
+      date = Date.utc_today()
+
+      assert Subscriber.make_recharge(subscriber, 100, date) ==
+               %Subscriber{
+                 full_name: "John Doe",
+                 phone: "1234567890",
+                 type: %Prepaid{credits: 110, recharges: [%Recharge{value: 100, date: date}]}
+               }
+    end
   end
 
   describe "postpaid" do
@@ -84,6 +101,19 @@ defmodule Telephony.Core.SubscriberTest do
                  type: %Postpaid{spent: 1.04},
                  calls: [%Call{time_spent: 1, date: date}]
                }
+    end
+
+    test "make_recharge/3" do
+      subscriber = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        type: %Postpaid{spent: 0}
+      }
+
+      date = Date.utc_today()
+
+      assert Subscriber.make_recharge(subscriber, 100, date) ==
+               {:error, "Only prepaid can make a recharge"}
     end
   end
 
