@@ -47,7 +47,7 @@ defmodule Telephony.Core.PrepaidTest do
       subscriber = %Telephony.Core.Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
-        subscriber_type: %Prepaid{
+        type: %Prepaid{
           credits: 213,
           recharges: [
             %Recharge{value: 100, date: date},
@@ -72,12 +72,12 @@ defmodule Telephony.Core.PrepaidTest do
         credits: 213
       }
 
-      subscriber_type = subscriber.subscriber_type
+      type = subscriber.type
       calls = subscriber.calls
       year = last_month.year
       month = last_month.month
 
-      result = SubscriberProtocol.print_invoice(subscriber_type, calls, year, month)
+      result = SubscriberProtocol.print_invoice(type, calls, year, month)
 
       assert expected == result
     end
