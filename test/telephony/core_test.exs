@@ -8,14 +8,14 @@ defmodule Telephony.CoreTest do
       %Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
-        subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
+        type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
       }
     ]
 
     payload = %{
       full_name: "John Doe",
       phone: "1234567890",
-      subscriber_type: :prepaid
+      type: :prepaid
     }
 
     {:ok, subscribers: subscribers, payload: payload}
@@ -30,7 +30,7 @@ defmodule Telephony.CoreTest do
         %{
           full_name: "John Doe",
           phone: "1234567890",
-          subscriber_type: :prepaid
+          type: :prepaid
         }
 
       # When
@@ -41,7 +41,7 @@ defmodule Telephony.CoreTest do
         %Subscriber{
           full_name: "John Doe",
           phone: "1234567890",
-          subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
+          type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
         }
       ]
 
@@ -54,7 +54,7 @@ defmodule Telephony.CoreTest do
         %{
           full_name: "Jane Doe",
           phone: "0987654321",
-          subscriber_type: :prepaid
+          type: :prepaid
         }
 
       # When
@@ -65,12 +65,12 @@ defmodule Telephony.CoreTest do
         %Subscriber{
           full_name: "John Doe",
           phone: "1234567890",
-          subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
+          type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
         },
         %Subscriber{
           full_name: "Jane Doe",
           phone: "0987654321",
-          subscriber_type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
+          type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
         }
       ]
 
@@ -84,7 +84,7 @@ defmodule Telephony.CoreTest do
     end
 
     test "show error when susbcriber type does not exist", %{payload: payload} do
-      payload = Map.put(payload, :subscriber_type, :something)
+      payload = Map.put(payload, :type, :something)
       result = Core.create_subscriber([], payload)
       assert {:error, "Only 'prepaid' and 'postpaid' are accepted"} == result
     end

@@ -14,7 +14,7 @@ defmodule Telephony.Core.PrepaidTest do
     test "with valid params", %{prepaid: prepaid} do
       time_spent = 2
       date = NaiveDateTime.utc_now()
-      result = Subscriber.make_call(prepaid, time_spent, date)
+      result = SubscriberProtocol.make_call(prepaid, time_spent, date)
       expected = {%Prepaid{credits: 7.1, recharges: []}, %Call{time_spent: 2, date: date}}
       assert expected == result
     end
@@ -22,7 +22,7 @@ defmodule Telephony.Core.PrepaidTest do
     test "error without credits", %{prepaid_without_credits: prepaid_without_credits} do
       time_spent = 2
       date = NaiveDateTime.utc_now()
-      result = Subscriber.make_call(prepaid_without_credits, time_spent, date)
+      result = SubscriberProtocol.make_call(prepaid_without_credits, time_spent, date)
       expected = {:error, "Subscriber does not have credits"}
       assert expected == result
     end
@@ -32,7 +32,7 @@ defmodule Telephony.Core.PrepaidTest do
     test "with valid params", %{prepaid: prepaid} do
       value = 100
       date = NaiveDateTime.utc_now()
-      result = Subscriber.make_recharge(prepaid, value, date)
+      result = SubscriberProtocol.make_recharge(prepaid, value, date)
       expected = %Prepaid{credits: 110, recharges: [%Recharge{value: 100, date: date}]}
       assert expected == result
     end
@@ -47,7 +47,7 @@ defmodule Telephony.Core.PrepaidTest do
       subscriber = %Telephony.Core.Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
-        subscriber_type: %Prepaid{
+        type: %Prepaid{
           credits: 213,
           recharges: [
             %Recharge{value: 100, date: date},
@@ -72,12 +72,12 @@ defmodule Telephony.Core.PrepaidTest do
         credits: 213
       }
 
-      subscriber_type = subscriber.subscriber_type
+      type = subscriber.type
       calls = subscriber.calls
       year = last_month.year
       month = last_month.month
 
-      result = Subscriber.print_invoice(subscriber_type, calls, year, month)
+      result = SubscriberProtocol.print_invoice(type, calls, year, month)
 
       assert expected == result
     end
