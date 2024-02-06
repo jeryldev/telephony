@@ -1,7 +1,7 @@
 defmodule Telephony.Core.SubscriberTest do
   use ExUnit.Case
 
-  alias Telephony.Core.{Postpaid, Prepaid, Subscriber}
+  alias Telephony.Core.{Call, Postpaid, Prepaid, Recharge, Subscriber}
 
   describe "new/1" do
     test "with valid prepaid payload" do
@@ -44,6 +44,46 @@ defmodule Telephony.Core.SubscriberTest do
       }
 
       assert expected == result
+    end
+  end
+
+  describe "prepaid" do
+    test "make_call/3" do
+      subscriber = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        subscriber_type: %Prepaid{credits: 10, recharges: []}
+      }
+
+      date = Date.utc_today()
+
+      assert Subscriber.make_call(subscriber, 1, date) ==
+               %Subscriber{
+                 full_name: "John Doe",
+                 phone: "1234567890",
+                 subscriber_type: %Prepaid{credits: 8.55, recharges: []},
+                 calls: [%Call{time_spent: 1, date: date}]
+               }
+    end
+  end
+
+  describe "postpaid" do
+    test "make_call/3" do
+      subscriber = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        subscriber_type: %Postpaid{spent: 0}
+      }
+
+      date = Date.utc_today()
+
+      assert Subscriber.make_call(subscriber, 1, date) ==
+               %Subscriber{
+                 full_name: "John Doe",
+                 phone: "1234567890",
+                 subscriber_type: %Postpaid{spent: 1.04},
+                 calls: [%Call{time_spent: 1, date: date}]
+               }
     end
   end
 
