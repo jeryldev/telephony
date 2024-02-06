@@ -82,6 +82,29 @@ defmodule Telephony.Core.SubscriberTest do
                  type: %Prepaid{credits: 110, recharges: [%Recharge{value: 100, date: date}]}
                }
     end
+
+    test "print_invoice/3" do
+      subscriber = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        type: %Prepaid{credits: 10, recharges: [%Recharge{value: 100, date: Date.utc_today()}]},
+        calls: [%Call{time_spent: 1, date: Date.utc_today()}]
+      }
+
+      assert Subscriber.print_invoice(subscriber, 2021, 1) ==
+               %{
+                 invoice: %{calls: [], credits: 10, recharges: []},
+                 subscriber: %Telephony.Core.Subscriber{
+                   full_name: "John Doe",
+                   phone: "1234567890",
+                   type: %Telephony.Core.Prepaid{
+                     credits: 10,
+                     recharges: [%Telephony.Core.Recharge{value: 100, date: ~D[2024-02-06]}]
+                   },
+                   calls: [%Telephony.Core.Call{time_spent: 1, date: ~D[2024-02-06]}]
+                 }
+               }
+    end
   end
 
   describe "postpaid" do
@@ -115,102 +138,25 @@ defmodule Telephony.Core.SubscriberTest do
       assert Subscriber.make_recharge(subscriber, 100, date) ==
                {:error, "Only prepaid can make a recharge"}
     end
+
+    test "print_invoice/3" do
+      subscriber = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        type: %Postpaid{spent: 10},
+        calls: [%Call{time_spent: 1, date: Date.utc_today()}]
+      }
+
+      assert Subscriber.print_invoice(subscriber, 2021, 1) ==
+               %{
+                 invoice: %{calls: [], value_spent: 0},
+                 subscriber: %Telephony.Core.Subscriber{
+                   full_name: "John Doe",
+                   phone: "1234567890",
+                   type: %Telephony.Core.Postpaid{spent: 10},
+                   calls: [%Telephony.Core.Call{time_spent: 1, date: ~D[2024-02-06]}]
+                 }
+               }
+    end
   end
-
-  # describe "make_call/3" do
-  #   setup do
-  #     date = NaiveDateTime.utc_now()
-
-  #     postpaid = %Subscriber{
-  #       full_name: "John Doe",
-  #       phone: "1234567890",
-  #       type: %Postpaid{spent: 0}
-  #     }
-
-  #     prepaid = %Subscriber{
-  #       full_name: "John Doe",
-  #       phone: "1234567890",
-  #       type: %Prepaid{credits: 7.0, recharges: []},
-  #       calls: [%Call{time_spent: 2, date: date}]
-  #     }
-
-  #     %{date: date, postpaid: postpaid, prepaid: prepaid}
-  #   end
-
-  #   test "with valid postpaid params", %{postpaid: postpaid} do
-  #     new_date = NaiveDateTime.utc_now()
-  #     result = SubscriberProtocol.make_call(postpaid, 2, new_date)
-
-  #     expected = %Subscriber{
-  #       full_name: "John Doe",
-  #       phone: "1234567890",
-  #       type: %Postpaid{spent: 2.08},
-  #       calls: [%Call{time_spent: 2, date: new_date}]
-  #     }
-
-  #     assert expected == result
-  #   end
-
-  #   test "with valid prepaid params", %{date: date, prepaid: prepaid} do
-  #     new_date = NaiveDateTime.utc_now()
-  #     result = SubscriberProtocol.make_call(prepaid, 1, new_date)
-
-  #     expected = %Subscriber{
-  #       full_name: "John Doe",
-  #       phone: "1234567890",
-  #       type: %Prepaid{credits: 5.55, recharges: []},
-  #       calls: [
-  #         %Call{time_spent: 2, date: date},
-  #         %Call{time_spent: 1, date: new_date}
-  #       ]
-  #     }
-
-  #     assert expected == result
-  #   end
-  # end
-
-  # describe "make_recharge/3" do
-  #   setup do
-  #     date = NaiveDateTime.utc_now()
-
-  #     postpaid = %Subscriber{
-  #       full_name: "John Doe",
-  #       phone: "1234567890",
-  #       type: %Postpaid{spent: 0}
-  #     }
-
-  #     prepaid = %Subscriber{
-  #       full_name: "John Doe",
-  #       phone: "1234567890",
-  #       type: %Prepaid{credits: 7.0, recharges: []},
-  #       calls: [%Call{time_spent: 2, date: date}]
-  #     }
-
-  #     %{date: date, postpaid: postpaid, prepaid: prepaid}
-  #   end
-
-  #   test "with valid prepaid recharge params", %{date: date, prepaid: prepaid} do
-  #     new_date = NaiveDateTime.utc_now()
-  #     result = SubscriberProtocol.make_recharge(prepaid, 100, new_date)
-
-  #     expected = %Subscriber{
-  #       full_name: "John Doe",
-  #       phone: "1234567890",
-  #       type: %Prepaid{
-  #         credits: 107.0,
-  #         recharges: [%Recharge{value: 100, date: new_date}]
-  #       },
-  #       calls: [%Call{time_spent: 2, date: date}]
-  #     }
-
-  #     assert expected == result
-  #   end
-
-  #   test "with valid postpaid recharge params", %{postpaid: postpaid} do
-  #     new_date = NaiveDateTime.utc_now()
-  #     result = SubscriberProtocol.make_recharge(postpaid, 100, new_date)
-
-  #     assert {:error, "Only prepaid can make a recharge"} == result
-  #   end
-  # end
 end

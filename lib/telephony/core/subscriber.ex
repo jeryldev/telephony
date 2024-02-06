@@ -34,4 +34,9 @@ defmodule Telephony.Core.Subscriber do
       type -> %{subscriber | type: type}
     end
   end
+
+  def print_invoice(subscriber, year, month) do
+    invoice = SubscriberProtocol.print_invoice(subscriber.type, subscriber.calls, year, month)
+    %{subscriber: subscriber, invoice: invoice}
+  end
 end
