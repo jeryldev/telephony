@@ -8,7 +8,7 @@ defmodule Telephony.CoreTest do
       %Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
-        type: %Telephony.Core.Prepaid{credits: 0, recharges: []}
+        type: %Core.Prepaid{credits: 0, recharges: []}
       }
     ]
 
@@ -87,6 +87,59 @@ defmodule Telephony.CoreTest do
       payload = Map.put(payload, :type, :something)
       result = Core.create_subscriber([], payload)
       assert {:error, "Only 'prepaid' and 'postpaid' are accepted"} == result
+    end
+  end
+
+  describe "search_subscriber/2" do
+    test "with valid subscriber to search", %{subscribers: subscribers} do
+      expected = %Subscriber{
+        full_name: "John Doe",
+        phone: "1234567890",
+        type: %Core.Prepaid{credits: 0, recharges: []}
+      }
+
+      result = Core.search_subscriber(subscribers, "1234567890")
+
+      assert expected == result
+    end
+
+    test "with invalid subscriber to search", %{subscribers: subscribers} do
+      expected = {:error, "Subscriber `0987654321`, not found"}
+      result = Core.search_subscriber(subscribers, "0987654321")
+      assert expected == result
+    end
+  end
+
+  describe "make_recharge/4" do
+    test "with valid params", %{subscribers: subscribers} do
+      date = NaiveDateTime.utc_now()
+
+      expected =
+        {[
+           %Subscriber{
+             full_name: "John Doe",
+             phone: "1234567890",
+             type: %Core.Prepaid{
+               credits: 100,
+               recharges: [%Core.Recharge{value: 100, date: date}]
+             }
+           }
+         ],
+         %Subscriber{
+           full_name: "John Doe",
+           phone: "1234567890",
+           type: %Core.Prepaid{credits: 100, recharges: [%Core.Recharge{value: 100, date: date}]}
+         }}
+
+      result = Core.make_recharge(subscribers, "1234567890", 100, date)
+
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make recharge", %{subscribers: subscribers} do
+      expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_recharge(subscribers, "0987654321", 100, NaiveDateTime.utc_now())
+      assert expected == result
     end
   end
 end
