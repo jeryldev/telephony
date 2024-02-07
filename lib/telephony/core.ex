@@ -34,6 +34,20 @@ defmodule Telephony.Core do
     |> maybe_make_call(subscribers, time_spent, date)
   end
 
+  def print_invoice(subscribers, phone, year, month) do
+    subscribers
+    |> search_subscriber(phone)
+    |> maybe_print_invoice(year, month)
+  end
+
+  defp maybe_print_invoice({:error, _message} = err, _year, _month) do
+    err
+  end
+
+  defp maybe_print_invoice(subscriber, year, month) do
+    Subscriber.print_invoice(subscriber, year, month)
+  end
+
   defp maybe_make_call({:error, _message} = err, subscribers, _value, _date) do
     {subscribers, err}
   end

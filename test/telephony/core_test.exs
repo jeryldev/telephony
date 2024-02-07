@@ -283,4 +283,69 @@ defmodule Telephony.CoreTest do
       assert expected == result
     end
   end
+
+  describe "print_invoice/4" do
+    setup do
+      date = NaiveDateTime.utc_now()
+      last_month = NaiveDateTime.add(date, -31, :day)
+      two_months_ago = NaiveDateTime.add(last_month, -31, :day)
+
+      subscribers = [
+        %Subscriber{
+          full_name: "John Doe",
+          phone: "1234567890",
+          type: %Core.Prepaid{
+            credits: 213,
+            recharges: [
+              %Core.Recharge{value: 100, date: date},
+              %Core.Recharge{value: 100, date: last_month},
+              %Core.Recharge{value: 100, date: two_months_ago}
+            ]
+          },
+          calls: [
+            %Core.Call{time_spent: 10, date: date},
+            %Core.Call{time_spent: 20, date: last_month},
+            %Core.Call{time_spent: 30, date: two_months_ago}
+          ]
+        }
+      ]
+
+      {:ok,
+       subscribers: subscribers,
+       date: date,
+       last_month: last_month,
+       two_months_ago: two_months_ago}
+    end
+
+    test "with valid params", %{
+      subscribers: subscribers,
+      date: date,
+      last_month: last_month,
+      two_months_ago: two_months_ago
+    } do
+      expected = %{
+        subscriber: %Telephony.Core.Subscriber{
+          full_name: "John Doe",
+          phone: "1234567890",
+          type: %Telephony.Core.Prepaid{
+            credits: 213,
+            recharges: [
+              %Telephony.Core.Recharge{value: 100, date: date},
+              %Telephony.Core.Recharge{value: 100, date: last_month},
+              %Telephony.Core.Recharge{value: 100, date: two_months_ago}
+            ]
+          },
+          calls: [
+            %Telephony.Core.Call{time_spent: 10, date: date},
+            %Telephony.Core.Call{time_spent: 20, date: last_month},
+            %Telephony.Core.Call{time_spent: 30, date: two_months_ago}
+          ]
+        },
+        invoice: %{calls: [], credits: 213, recharges: []}
+      }
+
+      result = Core.print_invoice(subscribers, "1234567890", 2021, 1)
+      assert expected == result
+    end
+  end
 end
