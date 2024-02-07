@@ -110,7 +110,19 @@ defmodule Telephony.CoreTest do
     end
   end
 
-  describe "make_recharge/4" do
+  describe "make_recharge/4 for prepaid" do
+    setup do
+      subscribers = [
+        %Subscriber{
+          full_name: "John Doe",
+          phone: "1234567890",
+          type: %Core.Prepaid{credits: 0, recharges: []}
+        }
+      ]
+
+      {:ok, subscribers: subscribers}
+    end
+
     test "with valid params", %{subscribers: subscribers} do
       date = NaiveDateTime.utc_now()
 
@@ -130,6 +142,43 @@ defmodule Telephony.CoreTest do
            phone: "1234567890",
            type: %Core.Prepaid{credits: 100, recharges: [%Core.Recharge{value: 100, date: date}]}
          }}
+
+      result = Core.make_recharge(subscribers, "1234567890", 100, date)
+
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make recharge", %{subscribers: subscribers} do
+      expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_recharge(subscribers, "0987654321", 100, NaiveDateTime.utc_now())
+      assert expected == result
+    end
+  end
+
+  describe "make_recharge/4 for postpaid" do
+    setup do
+      subscribers = [
+        %Subscriber{
+          full_name: "John Doe",
+          phone: "1234567890",
+          type: %Core.Postpaid{spent: 0}
+        }
+      ]
+
+      {:ok, subscribers: subscribers}
+    end
+
+    test "with valid params", %{subscribers: subscribers} do
+      date = NaiveDateTime.utc_now()
+
+      expected =
+        {[
+           %Subscriber{
+             full_name: "John Doe",
+             phone: "1234567890",
+             type: %Core.Postpaid{spent: 0}
+           }
+         ], {:error, "Only prepaid can make a recharge"}}
 
       result = Core.make_recharge(subscribers, "1234567890", 100, date)
 
