@@ -23,21 +23,27 @@ defmodule Telephony.Core do
   end
 
   def make_recharge(subscribers, phone, value, date) do
-    subscribers
-    |> search_subscriber(phone)
-    |> maybe_recharge_subscriber(subscribers, value, date)
+    execute_operation(
+      subscribers,
+      phone,
+      &maybe_recharge_subscriber(&1, subscribers, value, date)
+    )
   end
 
   def make_call(subscribers, phone, time_spent, date) do
-    subscribers
-    |> search_subscriber(phone)
-    |> maybe_make_call(subscribers, time_spent, date)
+    execute_operation(subscribers, phone, &maybe_make_call(&1, subscribers, time_spent, date))
   end
 
   def print_invoice(subscribers, phone, year, month) do
+    execute_operation(subscribers, phone, &maybe_print_invoice(&1, year, month))
+  end
+
+  def execute_operation(subscribers, phone, fun) do
     subscribers
     |> search_subscriber(phone)
-    |> maybe_print_invoice(year, month)
+    |> then(fn subscriber ->
+      fun.(subscriber)
+    end)
   end
 
   def print_invoices(subscribers, year, month) do
