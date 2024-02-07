@@ -3,7 +3,7 @@ defmodule Telephony.Core.Postpaid do
 
   defstruct spent: 0
 
-  defimpl SubscriberProtocol, for: __MODULE__ do
+  defimpl SubscriberProtocol, for: Telephony.Core.Postpaid do
     @price_per_minute 1.04
 
     def print_invoice(_type, calls, year, month) do

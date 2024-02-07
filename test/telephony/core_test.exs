@@ -148,8 +148,15 @@ defmodule Telephony.CoreTest do
       assert expected == result
     end
 
-    test "with invalid subscriber to make recharge", %{subscribers: subscribers} do
+    test "with missing subscriber to make recharge", %{subscribers: subscribers} do
       expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_recharge(subscribers, "0987654321", 100, NaiveDateTime.utc_now())
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make recharge" do
+      subscribers = [%{phone: "0987654321"}]
+      expected = {[%{phone: "0987654321"}], {:error, "Invalid subscriber"}}
       result = Core.make_recharge(subscribers, "0987654321", 100, NaiveDateTime.utc_now())
       assert expected == result
     end
@@ -185,8 +192,15 @@ defmodule Telephony.CoreTest do
       assert expected == result
     end
 
-    test "with invalid subscriber to make recharge", %{subscribers: subscribers} do
+    test "with missing subscriber to make recharge", %{subscribers: subscribers} do
       expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_recharge(subscribers, "0987654321", 100, NaiveDateTime.utc_now())
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make recharge" do
+      subscribers = [%{phone: "0987654321"}]
+      expected = {[%{phone: "0987654321"}], {:error, "Invalid subscriber"}}
       result = Core.make_recharge(subscribers, "0987654321", 100, NaiveDateTime.utc_now())
       assert expected == result
     end
@@ -231,8 +245,15 @@ defmodule Telephony.CoreTest do
       assert expected == result
     end
 
-    test "with invalid subscriber to make call", %{subscribers: subscribers} do
+    test "with missing subscriber to make call", %{subscribers: subscribers} do
       expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_call(subscribers, "0987654321", 2, NaiveDateTime.utc_now())
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make call" do
+      subscribers = [%{phone: "0987654321"}]
+      expected = {[%{phone: "0987654321"}], {:error, "Invalid subscriber"}}
       result = Core.make_call(subscribers, "0987654321", 2, NaiveDateTime.utc_now())
       assert expected == result
     end
@@ -277,8 +298,15 @@ defmodule Telephony.CoreTest do
       assert expected == result
     end
 
-    test "with invalid subscriber to make call", %{subscribers: subscribers} do
+    test "with missing subscriber to make call", %{subscribers: subscribers} do
       expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_call(subscribers, "0987654321", 2, NaiveDateTime.utc_now())
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make call" do
+      subscribers = [%{phone: "0987654321"}]
+      expected = {[%{phone: "0987654321"}], {:error, "Invalid subscriber"}}
       result = Core.make_call(subscribers, "0987654321", 2, NaiveDateTime.utc_now())
       assert expected == result
     end
@@ -347,6 +375,19 @@ defmodule Telephony.CoreTest do
       result = Core.print_invoice(subscribers, "1234567890", 2021, 1)
       assert expected == result
     end
+
+    test "with missing subscriber to print invoice", %{subscribers: subscribers} do
+      expected = {:error, "Subscriber `0987654321`, not found"}
+      result = Core.print_invoice(subscribers, "0987654321", 2021, 1)
+      assert expected == result
+    end
+
+    test "with invalid subscriber to print invoice" do
+      subscribers = [%{phone: "0987654321"}]
+      expected = {:error, "Invalid subscriber"}
+      result = Core.print_invoice(subscribers, "0987654321", 2021, 1)
+      assert expected == result
+    end
   end
 
   describe "print_invoices/3" do
@@ -411,6 +452,13 @@ defmodule Telephony.CoreTest do
         }
       ]
 
+      result = Core.print_invoices(subscribers, 2021, 1)
+      assert expected == result
+    end
+
+    test "with invalid subscriber to print invoice" do
+      subscribers = [%{phone: "0987654321"}]
+      expected = []
       result = Core.print_invoices(subscribers, 2021, 1)
       assert expected == result
     end

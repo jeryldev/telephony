@@ -16,7 +16,7 @@ defmodule Telephony.Core do
   end
 
   def search_subscriber(subscribers, phone) do
-    case Enum.find(subscribers, &(&1.phone == phone)) do
+    case Enum.find(subscribers, &(Map.get(&1, :phone) == phone)) do
       nil -> {:error, "Subscriber `#{phone}`, not found"}
       subscriber -> subscriber
     end

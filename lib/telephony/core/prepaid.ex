@@ -3,7 +3,7 @@ defmodule Telephony.Core.Prepaid do
 
   defstruct credits: 0, recharges: []
 
-  defimpl SubscriberProtocol, for: __MODULE__ do
+  defimpl SubscriberProtocol, for: Telephony.Core.Prepaid do
     @price_per_minute 1.45
 
     def print_invoice(
