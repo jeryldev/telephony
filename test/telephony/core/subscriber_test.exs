@@ -160,40 +160,17 @@ defmodule Telephony.Core.SubscriberTest do
     end
 
     test "make_call/3 with invalid subscriber" do
-      subscriber = %Subscriber{
-        full_name: "John Doe",
-        phone: "1234567890",
-        type: %Postpaid{spent: 0}
-      }
-
       date = Date.utc_today()
-
       assert Subscriber.make_call(%{}, 1, date) == {:error, "Invalid subscriber"}
     end
 
     test "make_recharge/3 with invalid subscriber" do
-      subscriber = %Subscriber{
-        full_name: "John Doe",
-        phone: "1234567890",
-        type: %Postpaid{spent: 0}
-      }
-
       date = Date.utc_today()
-
-      assert Subscriber.make_recharge(%{}, 100, date) ==
-               {:error, "Invalid subscriber"}
+      assert Subscriber.make_recharge(%{}, 100, date) == {:error, "Invalid subscriber"}
     end
 
     test "print_invoice/3 with invalid subscriber" do
-      subscriber = %Subscriber{
-        full_name: "John Doe",
-        phone: "1234567890",
-        type: %Postpaid{spent: 10},
-        calls: [%Call{time_spent: 1, date: ~D[2024-02-06]}]
-      }
-
-      assert Subscriber.print_invoice(%{}, 2021, 1) ==
-               {:error, "Invalid subscriber"}
+      assert Subscriber.print_invoice(%{}, 2021, 1) == {:error, "Invalid subscriber"}
     end
   end
 end
