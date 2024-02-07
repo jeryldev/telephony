@@ -191,4 +191,96 @@ defmodule Telephony.CoreTest do
       assert expected == result
     end
   end
+
+  describe "make_call/4 for prepaid" do
+    setup do
+      subscribers = [
+        %Subscriber{
+          full_name: "John Doe",
+          phone: "1234567890",
+          type: %Core.Prepaid{credits: 10, recharges: []}
+        }
+      ]
+
+      {:ok, subscribers: subscribers}
+    end
+
+    test "with valid params", %{subscribers: subscribers} do
+      date = NaiveDateTime.utc_now()
+
+      expected =
+        {
+          [
+            %Telephony.Core.Subscriber{
+              calls: [%Telephony.Core.Call{time_spent: 2, date: date}],
+              full_name: "John Doe",
+              phone: "1234567890",
+              type: %Telephony.Core.Prepaid{credits: 7.1, recharges: []}
+            }
+          ],
+          %Telephony.Core.Subscriber{
+            calls: [%Telephony.Core.Call{time_spent: 2, date: date}],
+            full_name: "John Doe",
+            phone: "1234567890",
+            type: %Telephony.Core.Prepaid{credits: 7.1, recharges: []}
+          }
+        }
+
+      result = Core.make_call(subscribers, "1234567890", 2, date)
+
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make call", %{subscribers: subscribers} do
+      expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_call(subscribers, "0987654321", 2, NaiveDateTime.utc_now())
+      assert expected == result
+    end
+  end
+
+  describe "make_call/4 for postpaid" do
+    setup do
+      subscribers = [
+        %Subscriber{
+          full_name: "John Doe",
+          phone: "1234567890",
+          type: %Core.Postpaid{spent: 0}
+        }
+      ]
+
+      {:ok, subscribers: subscribers}
+    end
+
+    test "with valid params", %{subscribers: subscribers} do
+      date = NaiveDateTime.utc_now()
+
+      expected =
+        {
+          [
+            %Telephony.Core.Subscriber{
+              calls: [%Telephony.Core.Call{time_spent: 2, date: date}],
+              full_name: "John Doe",
+              phone: "1234567890",
+              type: %Telephony.Core.Postpaid{spent: 2.08}
+            }
+          ],
+          %Telephony.Core.Subscriber{
+            calls: [%Telephony.Core.Call{time_spent: 2, date: date}],
+            full_name: "John Doe",
+            phone: "1234567890",
+            type: %Telephony.Core.Postpaid{spent: 2.08}
+          }
+        }
+
+      result = Core.make_call(subscribers, "1234567890", 2, date)
+
+      assert expected == result
+    end
+
+    test "with invalid subscriber to make call", %{subscribers: subscribers} do
+      expected = {subscribers, {:error, "Subscriber `0987654321`, not found"}}
+      result = Core.make_call(subscribers, "0987654321", 2, NaiveDateTime.utc_now())
+      assert expected == result
+    end
+  end
 end

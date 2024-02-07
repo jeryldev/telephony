@@ -28,6 +28,27 @@ defmodule Telephony.Core do
     |> maybe_recharge_subscriber(subscribers, value, date)
   end
 
+  def make_call(subscribers, phone, time_spent, date) do
+    subscribers
+    |> search_subscriber(phone)
+    |> maybe_make_call(subscribers, time_spent, date)
+  end
+
+  defp maybe_make_call({:error, _message} = err, subscribers, _value, _date) do
+    {subscribers, err}
+  end
+
+  defp maybe_make_call(subscriber, subscribers, value, date) do
+    case Subscriber.make_call(subscriber, value, date) do
+      {:error, message} ->
+        {subscribers, {:error, message}}
+
+      called_subscriber ->
+        subscribers = List.delete(subscribers, subscriber)
+        {subscribers ++ [called_subscriber], called_subscriber}
+    end
+  end
+
   defp maybe_recharge_subscriber({:error, _message} = err, subscribers, _value, _date) do
     {subscribers, err}
   end
