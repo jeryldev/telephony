@@ -40,6 +40,15 @@ defmodule Telephony.Core do
     |> maybe_print_invoice(year, month)
   end
 
+  def print_invoices(subscribers, year, month) do
+    Enum.reduce(subscribers, [], fn subscriber, acc ->
+      case maybe_print_invoice(subscriber, year, month) do
+        {:error, _message} -> acc
+        invoice -> acc ++ [invoice]
+      end
+    end)
+  end
+
   defp maybe_print_invoice({:error, _message} = err, _year, _month) do
     err
   end
