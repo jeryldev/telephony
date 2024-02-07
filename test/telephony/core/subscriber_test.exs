@@ -55,7 +55,7 @@ defmodule Telephony.Core.SubscriberTest do
         type: %Prepaid{credits: 10, recharges: []}
       }
 
-      date = Date.utc_today()
+      date = ~D[2024-02-06]
 
       assert Subscriber.make_call(subscriber, 1, date) ==
                %Subscriber{
@@ -87,8 +87,8 @@ defmodule Telephony.Core.SubscriberTest do
       subscriber = %Subscriber{
         full_name: "John Doe",
         phone: "1234567890",
-        type: %Prepaid{credits: 10, recharges: [%Recharge{value: 100, date: Date.utc_today()}]},
-        calls: [%Call{time_spent: 1, date: Date.utc_today()}]
+        type: %Prepaid{credits: 10, recharges: [%Recharge{value: 100, date: ~D[2024-02-06]}]},
+        calls: [%Call{time_spent: 1, date: ~D[2024-02-06]}]
       }
 
       assert Subscriber.print_invoice(subscriber, 2021, 1) ==
@@ -144,7 +144,7 @@ defmodule Telephony.Core.SubscriberTest do
         full_name: "John Doe",
         phone: "1234567890",
         type: %Postpaid{spent: 10},
-        calls: [%Call{time_spent: 1, date: Date.utc_today()}]
+        calls: [%Call{time_spent: 1, date: ~D[2024-02-06]}]
       }
 
       assert Subscriber.print_invoice(subscriber, 2021, 1) ==
