@@ -26,4 +26,12 @@ defmodule Telephony.Server do
       subscriber -> {:reply, subscriber, subscribers}
     end
   end
+
+  @impl true
+  def handle_cast({:make_recharge, phone, value, date}, subscribers) do
+    case Core.make_recharge(subscribers, phone, value, date) do
+      {subscribers, {:error, _message}} -> {:noreply, subscribers}
+      {subscribers, _updated_subscriber} -> {:noreply, subscribers}
+    end
+  end
 end

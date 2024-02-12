@@ -59,4 +59,30 @@ defmodule Telephony.ServerTest do
       assert {:error, "Subscriber `0987654321`, not found"} = result
     end
   end
+
+  describe "make_recharge/1" do
+    test "with valid phone", %{server_pid: server_pid} do
+      payload = %{full_name: "John Doe", phone: "123456789", type: :prepaid}
+      GenServer.call(server_pid, {:create_subscriber, payload})
+      date = Date.utc_today()
+      old_state = :sys.get_state(server_pid)
+      old_subscriber_state = hd(old_state)
+      assert [] = old_subscriber_state.type.recharges
+      assert :ok = GenServer.cast(server_pid, {:make_recharge, "123456789", 100, date})
+      new_state = :sys.get_state(server_pid)
+      new_subscriber_state = hd(new_state)
+      assert [recharge] = new_subscriber_state.type.recharges
+      assert 100 == recharge.value
+    end
+
+    test "with invalid phone", %{server_pid: server_pid} do
+      payload = %{full_name: "John Doe", phone: "123456789", type: :prepaid}
+      GenServer.call(server_pid, {:create_subscriber, payload})
+      date = Date.utc_today()
+      old_state = :sys.get_state(server_pid)
+      assert :ok = GenServer.cast(server_pid, {:make_recharge, "0987654321", 100, date})
+      new_state = :sys.get_state(server_pid)
+      assert old_state == new_state
+    end
+  end
 end
