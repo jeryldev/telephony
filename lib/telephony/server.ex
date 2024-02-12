@@ -18,4 +18,12 @@ defmodule Telephony.Server do
       subscribers -> {:reply, subscribers, subscribers}
     end
   end
+
+  @impl true
+  def handle_call({:search_subscriber, phone}, _from, subscribers) do
+    case Core.search_subscriber(subscribers, phone) do
+      {:error, _message} = err -> {:reply, err, subscribers}
+      subscriber -> {:reply, subscriber, subscribers}
+    end
+  end
 end
