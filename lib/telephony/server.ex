@@ -44,6 +44,14 @@ defmodule Telephony.Server do
   end
 
   @impl true
+  def handle_call({:print_invoices, year, month}, _from, subscribers) do
+    case Core.print_invoices(subscribers, year, month) do
+      {:error, _message} = err -> {:reply, err, subscribers}
+      invoices -> {:reply, invoices, subscribers}
+    end
+  end
+
+  @impl true
   def handle_cast({:make_recharge, phone, value, date}, subscribers) do
     case Core.make_recharge(subscribers, phone, value, date) do
       {subscribers, {:error, _message}} -> {:noreply, subscribers}
