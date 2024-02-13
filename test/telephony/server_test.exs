@@ -196,4 +196,53 @@ defmodule Telephony.ServerTest do
       assert expected == result
     end
   end
+
+  describe "print_invoice/1 prepaid" do
+    test "with valid phone", %{server_pid: server_pid, payload: payload} do
+      GenServer.call(server_pid, {:create_subscriber, payload})
+      phone = payload.phone
+      date = Date.utc_today()
+      assert :ok = GenServer.cast(server_pid, {:make_recharge, phone, 100, date})
+      GenServer.call(server_pid, {:make_call, phone, 20, date})
+      GenServer.call(server_pid, {:make_call, phone, 30, date})
+      year = date.year
+      month = date.month
+
+      expected = %{
+        subscriber: %Telephony.Core.Subscriber{
+          full_name: "John Doe",
+          phone: "123456789",
+          type: %Telephony.Core.Prepaid{
+            credits: 27.5,
+            recharges: [%Telephony.Core.Recharge{value: 100, date: date}]
+          },
+          calls: [
+            %Telephony.Core.Call{time_spent: 20, date: date},
+            %Telephony.Core.Call{time_spent: 30, date: date}
+          ]
+        },
+        invoice: %{
+          credits: 27.5,
+          recharges: [%{date: date, credits: 100}],
+          calls: [
+            %{date: date, time_spent: 20, value_spent: 29.0},
+            %{date: date, time_spent: 30, value_spent: 43.5}
+          ]
+        }
+      }
+
+      result = GenServer.call(server_pid, {:print_invoice, phone, year, month})
+      assert expected == result
+    end
+
+    test "with invalid phone", %{server_pid: server_pid, payload: payload} do
+      GenServer.call(server_pid, {:create_subscriber, payload})
+      phone = "0987654321"
+      year = 2021
+      month = 1
+      expected = {:error, "Subscriber `0987654321`, not found"}
+      result = GenServer.call(server_pid, {:print_invoice, phone, year, month})
+      assert expected == result
+    end
+  end
 end
