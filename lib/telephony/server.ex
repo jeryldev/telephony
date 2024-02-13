@@ -37,18 +37,14 @@ defmodule Telephony.Server do
 
   @impl true
   def handle_call({:print_invoice, phone, year, month}, _from, subscribers) do
-    case Core.print_invoice(subscribers, phone, year, month) do
-      {:error, _message} = err -> {:reply, err, subscribers}
-      invoice -> {:reply, invoice, subscribers}
-    end
+    result = Core.print_invoice(subscribers, phone, year, month)
+    {:reply, result, subscribers}
   end
 
   @impl true
   def handle_call({:print_invoices, year, month}, _from, subscribers) do
-    case Core.print_invoices(subscribers, year, month) do
-      {:error, _message} = err -> {:reply, err, subscribers}
-      invoices -> {:reply, invoices, subscribers}
-    end
+    result = Core.print_invoices(subscribers, year, month)
+    {:reply, result, subscribers}
   end
 
   @impl true
