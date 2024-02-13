@@ -1,5 +1,6 @@
 defmodule Telephony.ServerTest do
   use ExUnit.Case
+  alias Telephony.Core.{Call, Prepaid, Postpaid, Recharge}
   alias Telephony.Server
 
   setup do
@@ -24,7 +25,7 @@ defmodule Telephony.ServerTest do
         %Telephony.Core.Subscriber{
           full_name: "John Doe",
           phone: "123456789",
-          type: %Telephony.Core.Prepaid{credits: 0, recharges: []},
+          type: %Prepaid{credits: 0, recharges: []},
           calls: []
         }
       ]
@@ -105,11 +106,11 @@ defmodule Telephony.ServerTest do
       expected = %Telephony.Core.Subscriber{
         full_name: "John Doe",
         phone: "123456789",
-        type: %Telephony.Core.Prepaid{
+        type: %Prepaid{
           credits: 71.0,
-          recharges: [%Telephony.Core.Recharge{value: 100, date: ~D[2024-02-13]}]
+          recharges: [%Recharge{value: 100, date: date}]
         },
-        calls: [%Telephony.Core.Call{time_spent: 20, date: ~D[2024-02-13]}]
+        calls: [%Call{time_spent: 20, date: date}]
       }
 
       result = GenServer.call(server_pid, {:make_call, phone_number, time_spent, date})
@@ -119,6 +120,39 @@ defmodule Telephony.ServerTest do
     end
 
     test "with invalid phone", %{server_pid: server_pid, payload: payload} do
+      GenServer.call(server_pid, {:create_subscriber, payload})
+      phone_number = "0987654321"
+      time_spent = 100
+      date = Date.utc_today()
+      expected = {:error, "Subscriber `0987654321`, not found"}
+      result = GenServer.call(server_pid, {:make_call, phone_number, time_spent, date})
+      assert expected == result
+    end
+  end
+
+  describe "make_call/1 pospaid" do
+    test "with valid phone", %{server_pid: server_pid, payload: payload} do
+      payload = Map.put(payload, :type, :postpaid)
+      GenServer.call(server_pid, {:create_subscriber, payload})
+      phone_number = payload.phone
+      date = Date.utc_today()
+      time_spent = 100
+
+      expected = %Telephony.Core.Subscriber{
+        full_name: "John Doe",
+        phone: "123456789",
+        type: %Postpaid{spent: 104.0},
+        calls: [%Call{time_spent: 100, date: date}]
+      }
+
+      result = GenServer.call(server_pid, {:make_call, phone_number, time_spent, date})
+      assert expected == result
+      new_state = :sys.get_state(server_pid)
+      assert expected in new_state
+    end
+
+    test "with invalid phone", %{server_pid: server_pid, payload: payload} do
+      payload = Map.put(payload, :type, :postpaid)
       GenServer.call(server_pid, {:create_subscriber, payload})
       phone_number = "0987654321"
       time_spent = 100
