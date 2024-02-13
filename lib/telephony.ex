@@ -20,7 +20,7 @@ defmodule Telephony do
 
   ## Examples
 
-      iex> Telephony.search_subscriber("invalid")
+      iex> Telephony.search_subscriber("123456789")
   """
   def search_subscriber(phone) do
     GenServer.call(@server, {:search_subscriber, phone})
@@ -42,7 +42,7 @@ defmodule Telephony do
 
   ## Examples
 
-      iex> Telephony.make_call("invalid", 10, ~D[2020-01-01])
+      iex> Telephony.make_call("123456789", 10, ~D[2020-01-01])
   """
   def make_call(phone, duration, date) do
     GenServer.call(@server, {:make_call, phone, duration, date})
@@ -53,7 +53,7 @@ defmodule Telephony do
 
   ## Examples
 
-      iex> Telephony.print_invoice("invalid", 2020, 1)
+      iex> Telephony.print_invoice("123456789", 2020, 1)
   """
   def print_invoice(phone, year, month) do
     GenServer.call(@server, {:print_invoice, phone, year, month})
