@@ -3,7 +3,7 @@ defmodule Telephony.Application do
 
   def start(_type, _args) do
     children = [
-      {Telephony.Server, :telephony}
+      {Telephony.Server, :telephony_server}
     ]
 
     opts = [strategy: :one_for_one, name: __MODULE__]
